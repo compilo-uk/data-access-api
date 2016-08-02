@@ -1,2 +1,2 @@
-# data-access-api
+# Data Access API
 An abstraction API for accessing different data sources within the system architecture (RDBMS, NoSQL etc.)
