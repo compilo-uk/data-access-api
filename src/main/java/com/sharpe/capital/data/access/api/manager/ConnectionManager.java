@@ -1,4 +1,4 @@
-package com.sharpe.capital.connection.manager;
+package com.sharpe.capital.data.access.api.manager;
 
 import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.Result;

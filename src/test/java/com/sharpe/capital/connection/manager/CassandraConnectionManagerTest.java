@@ -5,6 +5,8 @@ import java.util.Date;
 
 import org.junit.Test;
 
+import com.sharpe.capital.data.access.api.manager.CassandraConnectionManager;
+import com.sharpe.capital.data.access.api.manager.ConnectionManager;
 import com.sharpe.capital.data.access.api.model.Quote;
 
 public class CassandraConnectionManagerTest {

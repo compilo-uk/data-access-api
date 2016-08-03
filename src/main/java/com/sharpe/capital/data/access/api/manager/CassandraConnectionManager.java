@@ -1,4 +1,4 @@
-package com.sharpe.capital.connection.manager;
+package com.sharpe.capital.data.access.api.manager;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
