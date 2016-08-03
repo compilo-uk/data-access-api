@@ -6,6 +6,9 @@ import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.MappingManager;
 import com.datastax.driver.mapping.Result;
 
+/**
+ * Connection manager implementation for Cassandra
+ */
 public final class CassandraConnectionManager implements ConnectionManager {
 
 	private static CassandraConnectionManager instance = null;
