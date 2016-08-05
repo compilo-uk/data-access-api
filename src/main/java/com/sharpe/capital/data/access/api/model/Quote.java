@@ -4,30 +4,38 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import com.datastax.driver.mapping.annotations.Column;
+import com.datastax.driver.mapping.annotations.ClusteringColumn;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
 @Table(keyspace = "fx_rate", name = "quote", readConsistency = "QUORUM", writeConsistency = "QUORUM", caseSensitiveKeyspace = false, caseSensitiveTable = false)
 public class Quote {
 
-	@PartitionKey(0)
+	@NonNull
+	@PartitionKey
 	@Column(name = "symbol")
 	private String symbol;
 
-	@PartitionKey(1)
+	@NonNull
+	@ClusteringColumn
 	@Column(name = "date")
 	private Date date;
 
+	@NonNull
 	@Column(name = "ask")
 	private BigDecimal ask;
 
+	@NonNull
 	@Column(name = "bid")
 	private BigDecimal bid;
 
