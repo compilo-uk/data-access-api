@@ -7,45 +7,27 @@ import com.datastax.driver.mapping.MappingManager;
 import com.datastax.driver.mapping.Result;
 
 /**
- * Connection manager implementation for Cassandra
+ * Connection manager for Cassandra
  */
-public final class CassandraConnectionManager implements ConnectionManager {
+public final class CassandraConnectionManager {
 
-	private static CassandraConnectionManager instance = null;
+	private static Cluster cluster = null;
 
-	private final String[] hosts;
+	private static Session session = null;
 
-	private final int port;
+	private static MappingManager manager = null;
+	
+	// TODO - we may use locking inside these methods, to apply sychronization across all methods, 
+	// i.e. if thread 1 is already creating a manager, thread 2 cannot attempt to execute a query until lock is released
 
-	private final Cluster cluster;
-
-	private final Session session;
-
-	private final MappingManager manager;
-
-	private CassandraConnectionManager(final String[] hosts, final int port) {
-		this.hosts = hosts;
-		this.port = port;
-		this.cluster = Cluster.builder().addContactPoints(this.hosts).withPort(this.port).build();
-		this.session = this.cluster.connect();
-		this.manager = new MappingManager(this.session);
-	}
-
-	/**
-	 * Returns a Singleton instance of the Cassandra connection manager
-	 * 
-	 * @param hosts
-	 *            an array of hosts in the Cassandra cluster
-	 * @param port
-	 *            the Cassandra connectivity port
-	 * 
-	 * @return Cassandra connection manager object
-	 */
-	public static CassandraConnectionManager getInstance(final String[] hosts, final int port) {
-		if (instance == null) {
-			instance = new CassandraConnectionManager(hosts, port);
+	public static synchronized void create(final String[] hosts, final int port) {
+		if(cluster == null && session == null && manager == null) {
+			cluster = Cluster.builder().addContactPoints(hosts).withPort(port).build();
+			session = cluster.connect();
+			manager = new MappingManager(session);
+		} else {
+			// TODO - log warning
 		}
-		return instance;
 	}
 
 	/**
@@ -53,24 +35,39 @@ public final class CassandraConnectionManager implements ConnectionManager {
 	 */
 	@Override
 	public void close() {
-		this.session.close();
-		this.cluster.close();
+		if(session != null && cluster != null && manager != null) {
+			session.close();
+			cluster.close();
+			session = null;
+			cluster = null;
+			manager = null;
+		} else {
+			// TODO - log error / warning?
+		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <T> Mapper<T> getMapper(Class<T> type) {
-		return this.manager.mapper(type);
+	public static synchronized <T> Mapper<T> getMapper(Class<T> type) {
+		if(manager != null) {
+			return manager.mapper(type);
+		} else {
+			// TODO - log error / warning?
+		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <T> Result<T> execute(String query, Class<T> type) {
-		return this.getMapper(type).map(this.session.execute(query));
+	public static synchronized <T> Result<T> execute(String query, Class<T> type) {
+		if(session != null) {
+			return getMapper(type).map(session.execute(query));
+		} else {
+			// TODO - log error / warning?
+		}
 	}
 
 }
