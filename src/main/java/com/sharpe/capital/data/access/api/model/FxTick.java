@@ -17,7 +17,7 @@ import lombok.NonNull;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @Table(keyspace = "fx_data", name = "tick", readConsistency = "QUORUM", writeConsistency = "QUORUM", caseSensitiveKeyspace = false, caseSensitiveTable = false)
-public class Tick {
+public class FxTick {
 
 	@NonNull
 	@PartitionKey
