@@ -9,7 +9,7 @@ import com.datastax.driver.mapping.Result;
 /**
  * Connection manager for Cassandra
  */
-public final class CassandraConnectionManager {
+public final class CassandraManager {
 
 	private static Cluster cluster = null;
 
@@ -31,10 +31,9 @@ public final class CassandraConnectionManager {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Closes the session & connection
 	 */
-	@Override
-	public void close() {
+	public static synchronized void close() {
 		if(session != null && cluster != null && manager != null) {
 			session.close();
 			cluster.close();
@@ -47,9 +46,13 @@ public final class CassandraConnectionManager {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns a mapper of given entity type
+	 * 
+	 * @param type
+	 *            the entity type to be used for the mapper
+	 * 
+	 * @return Cassandra mapper object
 	 */
-	@Override
 	public static synchronized <T> Mapper<T> getMapper(Class<T> type) {
 		if(manager != null) {
 			return manager.mapper(type);
@@ -59,9 +62,16 @@ public final class CassandraConnectionManager {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Executes a native Cassandra query, and returns the results as mapped Java
+	 * objects of specified type
+	 * 
+	 * @param query
+	 *            the native Cassandra query
+	 * @param type
+	 *            the entity type for the mapper
+	 * 
+	 * @return a list of specified object types
 	 */
-	@Override
 	public static synchronized <T> Result<T> execute(String query, Class<T> type) {
 		if(session != null) {
 			return getMapper(type).map(session.execute(query));
