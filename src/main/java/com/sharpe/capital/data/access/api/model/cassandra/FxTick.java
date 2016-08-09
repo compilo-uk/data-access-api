@@ -1,33 +1,39 @@
-package com.sharpe.capital.data.access.api.model;
+package com.sharpe.capital.data.access.api.model.cassandra;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
+import com.datastax.driver.mapping.annotations.ClusteringColumn;
 import com.datastax.driver.mapping.annotations.Column;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@Table(keyspace = "fx_rate", name = "quote", readConsistency = "QUORUM", writeConsistency = "QUORUM", caseSensitiveKeyspace = false, caseSensitiveTable = false)
-public class Quote {
+@RequiredArgsConstructor
+@Table(keyspace = "fx", name = "tick", readConsistency = "QUORUM", writeConsistency = "QUORUM", caseSensitiveKeyspace = false, caseSensitiveTable = false)
+public class FxTick {
 
-	@PartitionKey(0)
+	@NonNull
+	@PartitionKey
 	@Column(name = "symbol")
 	private String symbol;
 
-	@PartitionKey(1)
+	@NonNull
+	@ClusteringColumn
 	@Column(name = "date")
 	private Date date;
 
+	@NonNull
 	@Column(name = "ask")
 	private BigDecimal ask;
 
+	@NonNull
 	@Column(name = "bid")
 	private BigDecimal bid;
 
