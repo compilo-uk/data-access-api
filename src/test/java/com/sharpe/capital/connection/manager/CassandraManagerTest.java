@@ -7,25 +7,23 @@ import java.util.concurrent.Executors;
 import org.junit.Test;
 
 import com.datastax.driver.mapping.Mapper;
-import com.sharpe.capital.data.access.api.manager.CassandraConnectionManager;
-import com.sharpe.capital.data.access.api.manager.ConnectionManager;
+import com.sharpe.capital.data.access.api.manager.CassandraManager;
 import com.sharpe.capital.data.access.api.model.cassandra.FxTick;
 
-public class CassandraConnectionManagerTest {
+public class CassandraManagerTest {
 
 	private static final int PORT = 9042;
 
 	private static final String[] HOSTS = { "127.0.0.1" };
 
-	private static final ConnectionManager connectionManager = CassandraConnectionManager.getInstance(HOSTS, PORT);
-
-	private static final FxTick quote = new FxTick("AUD/USD", new Date(), BigDecimal.valueOf(1.0D),
-			BigDecimal.valueOf(1.0D));
+	private static final CassandraManager connectionManager = CassandraManager.getInstance(HOSTS, PORT);
 
 	@Test
-	public void testAddQuote() {
+	public void testAddQuote() throws InterruptedException {
 		Mapper<FxTick> fxTickMapper = connectionManager.getMapper(FxTick.class);
 		for (int i = 0; i < 10; i++) {
+			FxTick quote = new FxTick("AUD/USD", new Date(), BigDecimal.valueOf(1.0D), BigDecimal.valueOf(1.0D));
+			Thread.sleep(5L);
 			Executors.newCachedThreadPool().execute(() -> {
 				fxTickMapper.save(quote);
 			});

@@ -12,37 +12,30 @@ import com.datastax.driver.mapping.Result;
 public final class CassandraManager {
 
 	private static Cluster cluster = null;
-
 	private static Session session = null;
-
 	private static MappingManager manager = null;
-	
-	// TODO - we may use locking inside these methods, to apply sychronization across all methods, 
-	// i.e. if thread 1 is already creating a manager, thread 2 cannot attempt to execute a query until lock is released
 
-	public static synchronized void create(final String[] hosts, final int port) {
-		if(cluster == null && session == null && manager == null) {
-			cluster = Cluster.builder().addContactPoints(hosts).withPort(port).build();
-			session = cluster.connect();
-			manager = new MappingManager(session);
-		} else {
-			// TODO - log warning
+	private static CassandraManager instance = null;
+
+	private CassandraManager(String[] hosts, int port) {
+		cluster = Cluster.builder().addContactPoints(hosts).withPort(port).build();
+		session = cluster.connect();
+		manager = new MappingManager(session);
+	}
+
+	public static synchronized CassandraManager getInstance(final String[] hosts, final int port) {
+		if (instance == null) {
+			instance = new CassandraManager(hosts, port);
 		}
+		return instance;
 	}
 
 	/**
 	 * Closes the session & connection
 	 */
-	public static synchronized void close() {
-		if(session != null && cluster != null && manager != null) {
-			session.close();
-			cluster.close();
-			session = null;
-			cluster = null;
-			manager = null;
-		} else {
-			// TODO - log error / warning?
-		}
+	public void close() {
+		session.close();
+		cluster.close();
 	}
 
 	/**
@@ -53,12 +46,8 @@ public final class CassandraManager {
 	 * 
 	 * @return Cassandra mapper object
 	 */
-	public static synchronized <T> Mapper<T> getMapper(Class<T> type) {
-		if(manager != null) {
-			return manager.mapper(type);
-		} else {
-			// TODO - log error / warning?
-		}
+	public <T> Mapper<T> getMapper(Class<T> type) {
+		return manager.mapper(type);
 	}
 
 	/**
@@ -72,12 +61,8 @@ public final class CassandraManager {
 	 * 
 	 * @return a list of specified object types
 	 */
-	public static synchronized <T> Result<T> execute(String query, Class<T> type) {
-		if(session != null) {
-			return getMapper(type).map(session.execute(query));
-		} else {
-			// TODO - log error / warning?
-		}
+	public synchronized <T> Result<T> execute(String query, Class<T> type) {
+		return getMapper(type).map(session.execute(query));
 	}
 
 }
