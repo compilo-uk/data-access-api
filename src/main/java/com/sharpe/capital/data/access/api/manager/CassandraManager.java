@@ -11,8 +11,8 @@ import com.datastax.driver.mapping.Result;
  */
 public final class CassandraManager {
 	
-	private static String[] hosts = null;
-	private static int port = null;
+	private String[] hosts = null;
+	private int port = null;
 
 	private static Cluster cluster = null;
 	private static Session session = null;
