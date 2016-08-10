@@ -10,6 +10,9 @@ import com.datastax.driver.mapping.Result;
  * Connection manager for Cassandra
  */
 public final class CassandraManager {
+	
+	private static String[] hosts = null;
+	private static int port = null;
 
 	private static Cluster cluster = null;
 	private static Session session = null;
@@ -18,24 +21,51 @@ public final class CassandraManager {
 	private static CassandraManager instance = null;
 
 	private CassandraManager(String[] hosts, int port) {
+		this.hosts = hosts;
+		this.port = port;
+		this.connect(this.hosts, this.port);
+	}
+	
+	private void connect(String[] hosts, int port) {
 		cluster = Cluster.builder().addContactPoints(hosts).withPort(port).build();
 		session = cluster.connect();
 		manager = new MappingManager(session);
 	}
 
+	/**
+ 	* Returns a Singleton intance of the CassandraManager object
+ 	* 
+ 	* @param hosts an array of hosts in the Cassandra cluster
+ 	* @param port the Cassandra cluster connection port
+ 	* 
+ 	* @return the application-wide CassandraManager object instance
+ 	*/
 	public static synchronized CassandraManager getInstance(final String[] hosts, final int port) {
 		if (instance == null) {
 			instance = new CassandraManager(hosts, port);
 		}
 		return instance;
 	}
+	
+	/**
+	 * Creates a connection if it is currently closed
+	 */
+	public void connect() {
+		if(session == null && cluster == null) {
+			this.connect(this.hosts, this.port);
+		}
+	}
 
 	/**
-	 * Closes the session & connection
+	 * Closes the session & connection if they exist
 	 */
 	public void close() {
-		session.close();
-		cluster.close();
+		if(session != null && cluster != null) {
+			session.close();
+			cluster.close();
+			session = null;
+			cluster = null;
+		}
 	}
 
 	/**
