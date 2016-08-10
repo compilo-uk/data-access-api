@@ -1,6 +1,8 @@
 package com.sharpe.capital.data.access.api.manager;
 
 import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.MappingManager;
@@ -80,6 +82,30 @@ public final class CassandraManager {
 	 */
 	public <T> Mapper<T> getMapper(Class<T> type) {
 		return manager.mapper(type);
+	}
+
+	/**
+	 * Executes a native Cassandra query, and returns the results as a ResultSet
+	 * 
+	 * @param query
+	 *            the native Cassandra query
+	 * 
+	 * @return a ResultSet object
+	 */
+	public ResultSet getMany(String query) {
+		return session.execute(session.prepare(query).bind());
+	}
+
+	/**
+	 * Executes a native Cassandra query, and returns a single result as a Row
+	 * 
+	 * @param query
+	 *            the native Cassandra query
+	 * 
+	 * @return a Row object
+	 */
+	public Row getOne(String query) {
+		return session.execute(session.prepare(query).bind()).one();
 	}
 
 	/**
