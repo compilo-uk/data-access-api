@@ -18,17 +18,23 @@ import com.sharpe.capital.data.access.api.enums.CqlStatement;
 import com.sharpe.capital.data.access.api.manager.CassandraManager;
 import com.sharpe.capital.data.access.api.model.cassandra.FxTick;
 
+/**
+ * Tests Cassandra connectivity against a valid cluster, with the setup as
+ * defined within src/main/resources/setup.cql
+ * 
+ * TODO: Work out how to spin-up in-memory Cassandra for integration testing
+ */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CassandraManagerTest {
 
 	private static final int PORT = 9042;
 	private static final String[] HOSTS = { "127.0.0.1" };
 
-	private static final ExecutorService executor = Executors.newCachedThreadPool();
+	private static final ExecutorService executor = Executors.newFixedThreadPool(100);
 	private static final CassandraManager connectionManager = CassandraManager.getInstance(HOSTS, PORT);
 
 	@BeforeClass
-	public static void setup() {
+	public static void setup() throws Exception {
 		truncateFxTicks();
 	}
 

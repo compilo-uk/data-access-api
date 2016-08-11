@@ -1,0 +1,1 @@
+create table tick (symbol text, ask decimal, bid decimal, date timestamp, primary key(symbol, date)) with clustering order by (date desc);

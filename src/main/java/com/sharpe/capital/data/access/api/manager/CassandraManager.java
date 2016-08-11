@@ -13,21 +13,36 @@ import com.datastax.driver.mapping.Result;
  */
 public final class CassandraManager {
 
-	private final String[] hosts;
 	private final int port;
-
+	private final String[] hosts;
 	private static Cluster cluster = null;
 	private static Session session = null;
 	private static MappingManager manager = null;
-
 	private static CassandraManager instance = null;
 
+	/**
+	 * Private Constructor sets the hosts and port values, and calls private
+	 * connect method
+	 * 
+	 * @param hosts
+	 *            an array of hosts in the Cassandra cluster
+	 * @param port
+	 *            the connectivity port of the Cassandra cluster
+	 */
 	private CassandraManager(final String[] hosts, final int port) {
 		this.hosts = hosts;
 		this.port = port;
 		this.connect(this.hosts, this.port);
 	}
 
+	/**
+	 * Creates a Cassandra connection and configures Mapping Manager
+	 * 
+	 * @param hosts
+	 *            an array of hosts in the Cassandra cluster
+	 * @param port
+	 *            the connectivity port of the Cassandra cluster
+	 */
 	private void connect(final String[] hosts, final int port) {
 		cluster = Cluster.builder().addContactPoints(hosts).withPort(port).build();
 		session = cluster.connect();
@@ -119,7 +134,7 @@ public final class CassandraManager {
 	 * 
 	 * @return a list of specified object types
 	 */
-	public synchronized <T> Result<T> execute(String query, Class<T> type) {
+	public <T> Result<T> execute(String query, Class<T> type) {
 		return getMapper(type).map(session.execute(query));
 	}
 

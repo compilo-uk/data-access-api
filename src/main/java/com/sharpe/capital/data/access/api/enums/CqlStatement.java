@@ -1,7 +1,13 @@
 package com.sharpe.capital.data.access.api.enums;
 
+/**
+ * Defines all Native CQL statements to be used throughout the application
+ */
 public final class CqlStatement {
 
+	/**
+	 * Private Constructor restricts use of this class to static context only
+	 */
 	private CqlStatement() {
 	}
 
